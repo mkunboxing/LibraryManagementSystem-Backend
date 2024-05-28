@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/students', StudentRoutes)
-app.use('/api/staff', StaffRoutes)
+app.use('/staff', StaffRoutes)
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
