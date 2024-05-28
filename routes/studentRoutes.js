@@ -3,6 +3,17 @@ const express = require('express');
 const router = express.Router();
 const Student = require('../models/student');
 
+// Route to get the total number of students
+router.get('/count', async (req, res) => {
+  try {
+    const count = await Student.countDocuments();
+    res.json({ count });
+  } catch (error) {
+    console.error("Error fetching total students:", error);
+    res.status(500).json({ error: "Error fetching total students" });
+  }
+});
+
 // Get all students
 router.get('/', async (req, res) => {
   try {
