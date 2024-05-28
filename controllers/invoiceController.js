@@ -23,6 +23,41 @@ exports.getInvoiceById = async (req, res) => {
     }
 };
 
+exports.revenueGenerated = async (req, res) => {
+    try {
+        const invoices = await Invoice.find({ type: 'profit' });
+        const totalRevenue = invoices.reduce((total, invoice) => total + invoice.amount, 0);
+        res.status(200).json({ totalRevenue });
+    } catch (error) {
+        console.error("Error fetching revenue:", error);
+        res.status(500).json({ message: "Error fetching revenue", error });
+    }
+};
+
+exports.profitGenerated = async (req, res) => {
+    try {
+        const invoices = await Invoice.find();
+        const { totalRevenue, totalExpenses } = calculateTotalRevenueAndExpenses(invoices);
+        const totalProfit = totalRevenue - totalExpenses;
+        res.json({ totalProfit });
+    } catch (error) {
+        console.error("Error fetching profit:", error);
+        res.status(500).json({ message: "Error fetching profit", error });
+    }
+};
+
+// Helper function to calculate total revenue and expenses
+const calculateTotalRevenueAndExpenses = (invoices) => {
+    const totalRevenue = invoices
+        .filter(invoice => invoice.type === 'profit')
+        .reduce((total, invoice) => total + invoice.amount, 0);
+    
+    const totalExpenses = invoices
+        .filter(invoice => invoice.type === 'expense')
+        .reduce((total, invoice) => total + invoice.amount, 0);
+
+    return { totalRevenue, totalExpenses };
+};
 // Create a new invoice
 exports.createInvoice = async (req, res) => {
     try {

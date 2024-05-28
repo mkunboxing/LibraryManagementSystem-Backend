@@ -2,6 +2,12 @@ const express = require('express');
 const router = express.Router();
 const invoiceController = require('../controllers/invoiceController');
 
+//Get total revenue generated
+router.get('/revenue', invoiceController.revenueGenerated);
+
+// Get total profit generated
+router.get('/profit', invoiceController.profitGenerated);
+
 // Get all invoices
 router.get('/', invoiceController.getAllInvoices);
 
@@ -16,5 +22,7 @@ router.put('/:id', invoiceController.updateInvoice);
 
 // Delete an invoice
 router.delete('/:id', invoiceController.deleteInvoice);
+
+
 
 module.exports = router;
