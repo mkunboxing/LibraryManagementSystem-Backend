@@ -8,7 +8,7 @@ const StaffRoutes = require('./routes/staffRoutes');
 const InvoiceRoutes = require('./routes/InvoiceRoutes');
 
 const corsOptions = {
-    origin: ['http://localhost:3000','https://mk-library-management.vercel.app/'],
+    origin: ['http://localhost:3000','https://mk-library-management.vercel.app'],
     optionsSuccessStatus: 200,
     credentials: true // some legacy browsers (IE11, various SmartTVs) choke on 204
   };
