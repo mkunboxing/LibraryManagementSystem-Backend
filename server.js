@@ -6,7 +6,6 @@ const cors = require('cors');
 const StudentRoutes = require('./routes/studentRoutes');
 const StaffRoutes = require('./routes/staffRoutes');
 
-// connectDB();
 
 const corsOptions = {
     origin: ['http://localhost:3000',],
