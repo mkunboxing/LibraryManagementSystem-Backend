@@ -5,7 +5,6 @@ const User = require("../models/user");
 
 
 router.get("/login/success", async (req, res) => {
-    passport.authenticate("google", { failureRedirect: "/login/filled" });
     console.log("/login/success route",req.user)
     if (req.user) {
         const user = req.user._json

@@ -24,14 +24,15 @@ const corsOptions = {
 const PORT = process.env.PORT || 8000;
 
 app.use(express.json());
-app.use(cors());
+app.use(cors(corsOptions));
 
 app.use(cookieSession({
-    name: 'lms-session',
-    keys: ['LMS'],
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
-  })
-);
+  name: 'lms',
+  keys: [process.env.SESSION_SECRET || 'LMS'],
+  maxAge: 24 * 60 * 60 * 1000, // 24 hours
+  secure: process.env.NODE_ENV === 'production', // use HTTPS in production
+  
+}));
 // app.use(session({
 //   secret: process.env.SESSION_SECRET,
 //   resave: false,
