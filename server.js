@@ -32,20 +32,15 @@ app.use(cookieSession({
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   })
 );
-
 // app.use(session({
-//     secret: process.env.SESSION_SECRET,
-//     resave: false,
-//     saveUninitialized: false,
-//     store: MongoStore.create({
-//         mongoUrl: process.env.MONGO_URI,
-//         collectionName: 'sessions'
-//     }),
-//     cookie: {
-//         httpOnly: true,
-//         secure: process.env.NODE_ENV === 'production',
-//         maxAge: 1000 * 60 * 60 * 24, // 1 day
-//     }
+//   secret: process.env.SESSION_SECRET,
+//   resave: false,
+//   saveUninitialized: true,
+//   cookie: {
+//       secure: process.env.NODE_ENV === 'production', // use HTTPS in production
+//       httpOnly: true,
+//       sameSite: 'none'
+//   }
 // }));
 
 app.use(passport.initialize());

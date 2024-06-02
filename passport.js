@@ -7,11 +7,12 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "https://library-management-system-backend-lac.vercel.app/auth/google/callback",
+      callbackURL: `${process.env.BACKEND_URL}/auth/google/callback`,
       scope: ["profile", "email"],
     },
-    function (accessToken, refreshToken, profile, callback) {
-      callback(null, profile);
+    (accessToken, refreshToken, profile, done) => {
+      // Handle user authentication
+      return done(null, profile);
     }
   )
 );
