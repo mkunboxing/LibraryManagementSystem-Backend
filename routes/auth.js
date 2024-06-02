@@ -4,8 +4,15 @@ const passport = require("passport");
 const User = require("../models/user");
 
 
+router.get("/google", passport.authenticate("google",["profile", "email"]));
+
+router.get("/google/callback", passport.authenticate("google",{
+    failureRedirect: "/login/failed",
+    successRedirect: process.env.CLIENT_URL,
+}));
+
 router.get("/login/success", async (req, res) => {
-    // console.log("/login/success route",req.user)
+    console.log("/login/success route",req.user)
     if (req.user) {
         const user = req.user._json
         console.log(user)
@@ -44,13 +51,6 @@ router.get("/login/filled", (req, res) => {
         message: "User failed to login",
     });
 });
-
-router.get("/google/callback", passport.authenticate("google",{
-    successRedirect: process.env.CLIENT_URL,
-    failureRedirect: "/login/failed"
-}));
-
-router.get("/google", passport.authenticate("google",["profile", "email"]));
 
 router.get("/logout", (req, res) => {
     // req.session.destroy();
