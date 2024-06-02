@@ -32,7 +32,7 @@ router.get("/login/success", async (req, res) => {
     }else{
         res.status(403).json({
             error: true,
-            message: "Not authorized",
+            message: "Not authorized to access this route",
         });
     }
 });
