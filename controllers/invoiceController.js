@@ -3,7 +3,7 @@ const Invoice = require('../models/invoices');
 // Get all invoices
 exports.getAllInvoices = async (req, res) => {
     try {
-        const invoices = await Invoice.find();
+        const invoices = await Invoice.find({libraryId: req.user._json.email});
         res.status(200).json(invoices);
     } catch (error) {
         res.status(500).json({ message: "Error fetching invoices", error });
@@ -25,7 +25,7 @@ exports.getInvoiceById = async (req, res) => {
 
 exports.revenueGenerated = async (req, res) => {
     try {
-        const invoices = await Invoice.find({ type: 'profit' });
+        const invoices = await Invoice.find({ type: 'profit', libraryId: req.user._json.email });
         const totalRevenue = invoices.reduce((total, invoice) => total + invoice.amount, 0);
         res.status(200).json({ totalRevenue });
     } catch (error) {
@@ -36,7 +36,7 @@ exports.revenueGenerated = async (req, res) => {
 
 exports.profitGenerated = async (req, res) => {
     try {
-        const invoices = await Invoice.find();
+        const invoices = await Invoice.find({libraryId: req.user._json.email });
         const { totalRevenue, totalExpenses } = calculateTotalRevenueAndExpenses(invoices);
         const totalProfit = totalRevenue - totalExpenses;
         res.json({ totalProfit });
@@ -61,7 +61,7 @@ const calculateTotalRevenueAndExpenses = (invoices) => {
 // Create a new invoice
 exports.createInvoice = async (req, res) => {
     try {
-        const newInvoice = new Invoice(req.body);
+        const newInvoice = new Invoice({...req.body, libraryId: req.user._json.email});
         const savedInvoice = await newInvoice.save();
         res.status(201).json(savedInvoice);
     } catch (error) {

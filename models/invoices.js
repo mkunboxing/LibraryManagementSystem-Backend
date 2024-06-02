@@ -24,6 +24,11 @@ const InvoiceSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    libraryId: {
+        type: String,
+        required: true,
+        index: true,
+    }
 });
 
 module.exports = mongoose.model('Invoice', InvoiceSchema)

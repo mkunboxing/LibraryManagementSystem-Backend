@@ -6,6 +6,14 @@ const cors = require('cors');
 const StudentRoutes = require('./routes/studentRoutes');
 const StaffRoutes = require('./routes/staffRoutes');
 const InvoiceRoutes = require('./routes/InvoiceRoutes');
+const passport = require('passport');
+const passportSetup = require('./passport');
+const cookieSession = require('cookie-session');
+const authRoutes = require('./routes/auth');
+const requireAuth = require('./middleware/requireAuth');
+const session = require('express-session');
+
+
 
 const corsOptions = {
     origin: ['http://localhost:3000','https://mk-library-management.vercel.app'],
@@ -18,13 +26,40 @@ const PORT = process.env.PORT || 8000;
 app.use(express.json());
 app.use(cors(corsOptions));
 
+app.use(cookieSession({
+    name: 'lms-session',
+    keys: ['LMS'],
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  })
+);
+
+// app.use(session({
+//     secret: process.env.SESSION_SECRET,
+//     resave: false,
+//     saveUninitialized: false,
+//     store: MongoStore.create({
+//         mongoUrl: process.env.MONGO_URI,
+//         collectionName: 'sessions'
+//     }),
+//     cookie: {
+//         httpOnly: true,
+//         secure: process.env.NODE_ENV === 'production',
+//         maxAge: 1000 * 60 * 60 * 24, // 1 day
+//     }
+// }));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.get('/', (req, res) => {
     res.send('Hello World');
 });
 
-app.use('/students', StudentRoutes)
-app.use('/staff', StaffRoutes)
-app.use('/invoices', InvoiceRoutes)
+
+app.use('/auth', authRoutes)
+app.use('/students', requireAuth, StudentRoutes)
+app.use('/staff', requireAuth, StaffRoutes)
+app.use('/invoices', requireAuth, InvoiceRoutes)
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

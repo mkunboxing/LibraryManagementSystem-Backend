@@ -3,7 +3,7 @@ const StaffList = require('../models/staffList');
 // Get all staff members
 exports.getAllStaff = async (req, res) => {
   try {
-    const staff = await StaffList.find();
+    const staff = await StaffList.find({libraryId: req.user._json.email});
     res.status(200).json(staff);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -32,6 +32,7 @@ exports.createStaff = async (req, res) => {
     phoneNo,
     address,
     salary,
+    libraryId: req.user._json.email,
   });
 
   try {

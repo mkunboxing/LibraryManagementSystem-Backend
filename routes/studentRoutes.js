@@ -6,7 +6,7 @@ const Student = require('../models/student');
 // Route to get the total number of students
 router.get('/count', async (req, res) => {
   try {
-    const count = await Student.countDocuments();
+    const count = await Student.countDocuments({libraryId: req.user._json.email});
     res.json({ count });
   } catch (error) {
     console.error("Error fetching total students:", error);
@@ -17,7 +17,7 @@ router.get('/count', async (req, res) => {
 // Get all students
 router.get('/', async (req, res) => {
   try {
-    const students = await Student.find();
+    const students = await Student.find({libraryId: req.user._json.email});
     res.json(students);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -36,27 +36,37 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create a new student
-router.post('/', async (req, res) => {
-  const student = new Student({
-    registrationNumber: req.body.registrationNumber,
-    name: req.body.name,
-    age: req.body.age,
-    phoneNo: req.body.phoneNo,
-    email: req.body.email,
-    address: req.body.address,
-    preparationType: req.body.preparationType,
-    fee: req.body.fee,
-    time: req.body.time,
-    status: req.body.status,
-  });
 
+router.post('/', async (req, res) => {
   try {
-    const newStudent = await student.save();
-    res.status(201).json(newStudent);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
+    const newStudent = new Student({
+      registrationNumber: req.body.registrationNumber,
+      name: req.body.name,
+      fatherName: req.body.fatherName,
+      gender: req.body.gender,
+      dob: req.body.dob,
+      phoneNo: req.body.phoneNo,
+      guardianPhoneNo: req.body.guardianPhoneNo,
+      email: req.body.email,
+      address: req.body.address,
+      qualification: req.body.qualification,
+      preparationType: req.body.preparationType,
+      fee: req.body.fee,
+      shiftTime: req.body.shiftTime,
+      pinCode: req.body.pinCode,
+      district: req.body.district,
+      status: req.body.status,
+      libraryId: req.user._json.email,
+    });
+
+    const savedStudent = await newStudent.save();
+    res.status(201).json(savedStudent);
+  } catch (error) {
+    console.error("Error creating student:", error);
+    res.status(500).json({ message: "Error creating student", error: error.message });
   }
 });
+
 // Update a student by ID
 
 router.put('/:id', async (req, res) => {
