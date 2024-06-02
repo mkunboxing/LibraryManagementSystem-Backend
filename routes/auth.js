@@ -5,7 +5,7 @@ const User = require("../models/user");
 
 
 router.get("/login/success", async (req, res) => {
-    console.log(req.user)
+    console.log("/login/success route",req.user)
     if (req.user) {
         const user = req.user._json
         console.log(user)
@@ -13,7 +13,7 @@ router.get("/login/success", async (req, res) => {
         if (!userInDB) {
             const newUser = new User({
                 firstName: user.given_name,
-                // lastName: user.family_name,
+                lastName: user.family_name,
                 libraryId: user.email,
                 image: user.picture,
                 sub: user.sub,
@@ -23,18 +23,18 @@ router.get("/login/success", async (req, res) => {
             await newUser.save()
         }
         
-        if (req.isAuthenticated()) {
-            res.status(200).json({ user: req.user });
-        } else {
-            res.status(403).json({ message: 'Unauthorized' });
-        }
+        res.status(200).json({
+            error: false,
+            message: "Successfully Logged In",
+            user: req.user
+            
+        });
+    }else{
+        res.status(403).json({
+            error: true,
+            message: "Not authorized",
+        });
     }
-    // else{
-    //     res.status(403).json({
-    //         error: true,
-    //         message: "Not authorized",
-    //     });
-    // }
 });
 
 router.get("/login/filled", (req, res) => {
