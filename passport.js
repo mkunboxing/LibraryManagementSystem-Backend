@@ -10,8 +10,8 @@ passport.use(
       callbackURL: `${process.env.BACKEND_URL}/auth/google/callback`,
       scope: ["profile", "email"],
     },
-    function (accessToken, refreshToken, profile, callback) {
-      callback(null, profile);
+    function (accessToken, refreshToken, profile, done) {
+      done(null, profile);
     }
   )
 );
