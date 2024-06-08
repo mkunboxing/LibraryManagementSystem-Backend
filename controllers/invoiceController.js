@@ -3,7 +3,11 @@ const Invoice = require('../models/invoices');
 // Get all invoices
 exports.getAllInvoices = async (req, res) => {
     try {
-        const invoices = await Invoice.find({libraryId: req.user._json.email});
+        const libraryId = req.headers.libraryid;
+        if (!libraryId) {
+            return res.status(400).json({ error: 'LibraryId not provided in headers' });
+        }
+        const invoices = await Invoice.find({ libraryId: libraryId });
         res.status(200).json(invoices);
     } catch (error) {
         res.status(500).json({ message: "Error fetching invoices", error });
@@ -25,7 +29,11 @@ exports.getInvoiceById = async (req, res) => {
 
 exports.revenueGenerated = async (req, res) => {
     try {
-        const invoices = await Invoice.find({ type: 'profit', libraryId: req.user._json.email });
+        const libraryId = req.headers.libraryid;
+        if (!libraryId) {
+            return res.status(400).json({ error: 'LibraryId not provided in headers' });
+        }
+        const invoices = await Invoice.find({ type: 'profit', libraryId: libraryId });
         const totalRevenue = invoices.reduce((total, invoice) => total + invoice.amount, 0);
         res.status(200).json({ totalRevenue });
     } catch (error) {
@@ -36,7 +44,11 @@ exports.revenueGenerated = async (req, res) => {
 
 exports.profitGenerated = async (req, res) => {
     try {
-        const invoices = await Invoice.find({libraryId: req.user._json.email });
+        const libraryId = req.headers.libraryid;
+        if (!libraryId) {
+            return res.status(400).json({ error: 'LibraryId not provided in headers' });
+        }
+        const invoices = await Invoice.find({ libraryId: libraryId });
         const { totalRevenue, totalExpenses } = calculateTotalRevenueAndExpenses(invoices);
         const totalProfit = totalRevenue - totalExpenses;
         res.json({ totalProfit });
@@ -58,10 +70,15 @@ const calculateTotalRevenueAndExpenses = (invoices) => {
 
     return { totalRevenue, totalExpenses };
 };
+
 // Create a new invoice
 exports.createInvoice = async (req, res) => {
     try {
-        const newInvoice = new Invoice({...req.body, libraryId: req.user._json.email});
+        const libraryId = req.headers.libraryid;
+        if (!libraryId) {
+            return res.status(400).json({ error: 'LibraryId not provided in headers' });
+        }
+        const newInvoice = new Invoice({ ...req.body, libraryId: libraryId });
         const savedInvoice = await newInvoice.save();
         res.status(201).json(savedInvoice);
     } catch (error) {

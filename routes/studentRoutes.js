@@ -1,12 +1,15 @@
-// routes/students.js
 const express = require('express');
 const router = express.Router();
 const Student = require('../models/student');
 
-// Route to get the total number of students
+// Route to get the total number of students for the logged-in user
 router.get('/count', async (req, res) => {
   try {
-    const count = await Student.countDocuments({libraryId: req.user._json.email});
+    const libraryId = req.headers.libraryid; // Extract libraryId from request headers
+    if (!libraryId) {
+      return res.status(400).json({ error: 'LibraryId not provided in headers' });
+    }
+    const count = await Student.countDocuments({ libraryId: libraryId });
     res.json({ count });
   } catch (error) {
     console.error("Error fetching total students:", error);
@@ -14,20 +17,34 @@ router.get('/count', async (req, res) => {
   }
 });
 
-// Get all students
+// Get all students for the logged-in user
 router.get('/', async (req, res) => {
   try {
-    const students = await Student.find({libraryId: req.user._json.email});
+    const libraryId = req.headers.libraryid; // Extract libraryId from request headers
+    if (!libraryId) {
+      return res.status(400).json({ error: 'LibraryId not provided in headers' });
+    }
+
+    // Find students with the given libraryId
+    const students = await Student.find({ libraryId: libraryId });
+
+    // Return the found students
     res.json(students);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+  } catch (error) {
+    console.error('Error fetching students by libraryId:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-// Get a student by ID
+// Get a student by ID for the logged-in user
 router.get('/:id', async (req, res) => {
   try {
-    const student = await Student.findById(req.params.id);
+    const libraryId = req.headers.libraryid; // Extract libraryId from request headers
+    if (!libraryId) {
+      return res.status(400).json({ error: 'LibraryId not provided in headers' });
+    }
+
+    const student = await Student.findOne({ _id: req.params.id, libraryId: libraryId }); // Use libraryId from headers
     if (!student) return res.status(404).json({ message: 'Student not found' });
     res.json(student);
   } catch (err) {
@@ -35,28 +52,17 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Create a new student
-
+// Create a new student for the logged-in user
 router.post('/', async (req, res) => {
   try {
+    const libraryId = req.headers.libraryid; // Extract libraryId from request headers
+    if (!libraryId) {
+      return res.status(400).json({ error: 'LibraryId not provided in headers' });
+    }
+
     const newStudent = new Student({
-      registrationNumber: req.body.registrationNumber,
-      name: req.body.name,
-      fatherName: req.body.fatherName,
-      gender: req.body.gender,
-      dob: req.body.dob,
-      phoneNo: req.body.phoneNo,
-      guardianPhoneNo: req.body.guardianPhoneNo,
-      email: req.body.email,
-      address: req.body.address,
-      qualification: req.body.qualification,
-      preparationType: req.body.preparationType,
-      fee: req.body.fee,
-      shiftTime: req.body.shiftTime,
-      pinCode: req.body.pinCode,
-      district: req.body.district,
-      status: req.body.status,
-      libraryId: req.user._json.email,
+      ...req.body,
+      libraryId: libraryId, // Use libraryId from headers
     });
 
     const savedStudent = await newStudent.save();
@@ -67,11 +73,19 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Update a student by ID
-
+// Update a student by ID for the logged-in user
 router.put('/:id', async (req, res) => {
   try {
-    const student = await Student.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const libraryId = req.headers.libraryid; // Extract libraryId from request headers
+    if (!libraryId) {
+      return res.status(400).json({ error: 'LibraryId not provided in headers' });
+    }
+
+    const student = await Student.findOneAndUpdate(
+      { _id: req.params.id, libraryId: libraryId }, // Use libraryId from headers
+      req.body,
+      { new: true }
+    );
     if (!student) {
       return res.status(404).send({ message: 'Student not found' });
     }
@@ -81,27 +95,15 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// router.patch('/:id', async (req, res) => {
-//   try {
-//     const student = await Student.findById(req.params.id);
-//     if (!student) return res.status(404).json({ message: 'Student not found' });
-
-//     Object.keys(req.body).forEach(key => {
-//       student[key] = req.body[key];
-//     });
-
-//     const updatedStudent = await student.save();
-//     res.json(updatedStudent);
-//   } catch (err) {
-//     res.status(400).json({ message: err.message });
-//   }
-// });
-
-
-// Delete a student by ID
+// Delete a student by ID for the logged-in user
 router.delete('/:id', async (req, res) => {
   try {
-    await Student.findByIdAndDelete(req.params.id);
+    const libraryId = req.headers.libraryid; // Extract libraryId from request headers
+    if (!libraryId) {
+      return res.status(400).json({ error: 'LibraryId not provided in headers' });
+    }
+
+    await Student.findOneAndDelete({ _id: req.params.id, libraryId: libraryId }); // Use libraryId from headers
     res.json({ message: 'Student deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });

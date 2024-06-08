@@ -3,7 +3,11 @@ const StaffList = require('../models/staffList');
 // Get all staff members
 exports.getAllStaff = async (req, res) => {
   try {
-    const staff = await StaffList.find({libraryId: req.user._json.email});
+    const libraryId = req.headers.libraryid;
+    if (!libraryId) {
+      return res.status(400).json({ error: 'LibraryId not provided in headers' });
+    }
+    const staff = await StaffList.find({ libraryId: libraryId });
     res.status(200).json(staff);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -24,6 +28,10 @@ exports.getStaffById = async (req, res) => {
 // Create a new staff member
 exports.createStaff = async (req, res) => {
   const { name, age, email, phoneNo, address, salary } = req.body;
+  const libraryId = req.headers.libraryid;
+  if (!libraryId) {
+    return res.status(400).json({ error: 'LibraryId not provided in headers' });
+  }
 
   const newStaff = new StaffList({
     name,
@@ -32,7 +40,7 @@ exports.createStaff = async (req, res) => {
     phoneNo,
     address,
     salary,
-    libraryId: req.user._json.email,
+    libraryId: libraryId,
   });
 
   try {

@@ -1,7 +1,9 @@
 // controllers/authController.js
 exports.currentUser = (req, res) => {
     res.send(req.user);
-    console.log(req.user)
+    console.log("this is from controller ",req.session)
+    console.log("this is from controller current user",req.user)
+    // console.log("this is req", req);
   };
   
 exports.logout = (req, res) => {

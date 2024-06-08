@@ -7,7 +7,6 @@ const cors = require("cors");
 const StudentRoutes = require("./routes/studentRoutes");
 const StaffRoutes = require("./routes/staffRoutes");
 const InvoiceRoutes = require("./routes/InvoiceRoutes");
-// const authRoutes = require("./routes/auth");
 const session = require('express-session');
 // const cookieSession = require('cookie-session');
 const passport = require('passport');
@@ -18,6 +17,7 @@ require('./service/passport');
 
 
 const authRoutes = require('./routes/authRoutes');
+const requireAuth = require("./middleware/requireAuth");
 
 const corsOptions = {
   origin: ["http://localhost:3000", "https://mk-library-management.vercel.app", "https://library-system-flax.vercel.app"],
@@ -44,27 +44,15 @@ mongoose.connection.on('disconnected', () => {
 });
 
 
-app.use(session({
-  secret: 'your_secret_key',
-  resave: false,
-  saveUninitialized: false
-}));
+// app.use(session({
+//   secret: 'your_secret_key',
+//   resave: false,
+//   saveUninitialized: false
+// }));
 
 app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.session());
 
-// const { auth } = require('express-openid-connect');
-// const config = require('./auth0Config');
-
-
-
-
-// app.use(session({
-//   secret: process.env.SESSION_SECRET,
-//   resave: false,
-//   saveUninitialized: true,
-//   cookie: { secure: false } // Set to true if using HTTPS
-// }));
 
 app.use(express.json());
 
@@ -73,12 +61,12 @@ app.use(express.json());
 
 // app.use(checkJwt);
 
-app.use(authRoutes);
 
-// app.use('/auth', authRoutes)
-// app.use("/students", StudentRoutes);
-// app.use("/staff", StaffRoutes);
-// app.use("/invoices", InvoiceRoutes);
+
+app.use('/auth', authRoutes)
+app.use("/students", StudentRoutes);
+app.use("/staff", StaffRoutes);
+app.use("/invoices", InvoiceRoutes);
 
 // app.listen(PORT, () => {
 //   console.log(`Server running on port ${PORT}`);
