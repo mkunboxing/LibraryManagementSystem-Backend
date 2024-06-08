@@ -16,8 +16,11 @@ const PORT = process.env.PORT || 8000;
 require('./models/user');
 require('./service/passport');
 
+
+const authRoutes = require('./routes/authRoutes');
+
 const corsOptions = {
-  origin: ["http://localhost:3000", "https://mk-library-management.vercel.app"],
+  origin: ["http://localhost:3000", "https://mk-library-management.vercel.app", "https://library-system-flax.vercel.app"],
   optionsSuccessStatus: 200,
   credentials: true, // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
@@ -70,7 +73,6 @@ app.use(express.json());
 
 // app.use(checkJwt);
 
-const authRoutes = require('./routes/authRoutes');
 app.use(authRoutes);
 
 // app.use('/auth', authRoutes)
