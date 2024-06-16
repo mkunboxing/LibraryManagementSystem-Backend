@@ -1,23 +1,55 @@
-// controllers/authController.js
-exports.currentUser = (req, res) => {
-    res.send(req.user);
-    console.log("this is from controller ",req.session)
-    console.log("this is from controller current user",req.user)
-    // console.log("this is req", req);
-  };
-  
-exports.logout = (req, res) => {
-  // Call req.logout() with a callback function
-  req.logout(() => {
-    // Logout successful, send response or redirect
-    res.send("Logout successful"); // Example response
-  });
-};
-  
-  exports.protected = (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).send('You must log in!');
+
+const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
+const User = mongoose.model("User");
+const keys = require("../config/keys");
+require("dotenv").config();
+
+exports.signup = async (req, res) => {
+  const { name, email, password } = req.body;
+
+  try {
+    const existingUser = await User.findOne({ libraryId: email });
+    if (existingUser) {
+      return res.status(400).send("User already exists");
     }
-    res.send('This is a protected route');
-  };
-  
+
+    const user = new User({
+      libraryId: email,
+      displayName: `${name}`,
+      password,
+    });
+
+    await user.save();
+    const payload = { id: user.id, displayName: user.displayName };
+    const token = jwt.sign(payload, keys.jwtSecret, { expiresIn: "12h" });
+
+    res
+      .status(201)
+      .json({
+        token,
+        user,
+        redirectUrl: `${process.env.CLIENT_URL}/dashboard`,
+      });
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+};
+
+exports.login = async (req, res) =>{
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ libraryId: email });
+    if (!user || !(await user.comparePassword(password))) {
+      return res.status(400).send('Invalid email or password');
+    }
+
+    const payload = { id: user.id, displayName: user.displayName };
+    const token = jwt.sign(payload, keys.jwtSecret, { expiresIn: '12h' });
+
+    res.json({ token, user, redirectUrl: `${process.env.CLIENT_URL}/dashboard` });
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+};

@@ -1,25 +1,20 @@
-// const mongoose = require('mongoose');
-// require('dotenv').config();
+const mongoose = require('mongoose');
+const keys = require('./config/keys');
 
-// const mongoURL = process.env.MONGODB_URI;
-
-// mongoose.connect(mongoURL, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true
-// })
-
-// const db = mongoose.connection;
-
-// db.on('connected', () => {
-//     console.log('Connected to MongoDB server');
-// });
-
-// db.on('error', (err) => {
-//     console.error('MongoDB connection error:', err);
-// });
-
-// db.on('disconnected', () => {
-//     console.log('MongoDB disconnected');
-// });
-
-// module.exports = db;
+mongoose.connect(keys.mongoURI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+  
+  mongoose.connection.on('connected', () => {
+    console.log('Mongoose connected ');
+  });
+  
+  mongoose.connection.on('error', (err) => {
+    console.log('Mongoose connection error:', err);
+  });
+  
+  mongoose.connection.on('disconnected', () => {
+    console.log('Mongoose disconnected');
+  });
+  
